@@ -1,49 +1,64 @@
 import express from 'express';
 import 'express-async-errors';
+import * as userRepository from './auth.js';
 
 let tweets = [
-  {
-    id: '1',
-    text: 'Lets gooooooooooooo',
-    createdAt: Date.now().toString(),
-    name: 'Chulasync ',
-    username: 'ChulJJA',
-    url: '',
-  },
-  {
-    id: '2',
-    text: 'wassup',
-    createdAt: Date.now().toString(),
-    name: 'Seung',
-    username: 'Seung',
-    url: '',
-  },
+  // {
+  //   id: '1',
+  //   text: 'Lets gooooooooooooo',
+  //   createdAt: new Date().toString(),
+  //   userId: '1',
+  // },
+  // {
+  //   id: '2',
+  //   text: 'wassup',
+  //   createdAt: new Date().toString(),
+  //   userId: '2',
+  // },
 ];
 
 export async function getAll() {
-  return tweets;
+  return Promise.all(
+    tweets.map(async (tweet) => {
+      const { username, name, url } = await userRepository.findById(
+        tweet.userId
+      );
+      console.log(username);
+      return { ...tweet, username, name, url };
+    })
+  );
 }
 
 export async function getAllByUsername(username) {
-  return tweets.filter((tweet) => tweet.username === username);
+  return getAll().then((tweets) => {
+    const filteredTweets = tweets.filter(
+      (tweet) => tweet.username === username
+    );
+    console.log(filteredTweets);
+    return filteredTweets;
+  });
 }
 
 export async function getById(id) {
-  return tweets.find((tweet) => tweet.id === id);
+  const found = tweets.find((tweet) => tweet.id === id);
+  if (!found) {
+    return null;
+  }
+  const { username, name, url } = await userRepository.findById(found.userId);
+  return { ...found, username, name, url };
 }
 
-export async function create(text, name, username) {
+export async function create(text, userId) {
   const tweet = {
     id: Date.now().toString(),
     text,
     createdAt: new Date(),
-    name,
-    username,
+    userId,
   };
 
   tweets = [tweet, ...tweets];
 
-  return tweet;
+  return getById(tweet.id);
 }
 
 export async function update(id, text) {
@@ -52,7 +67,7 @@ export async function update(id, text) {
     tweet.text = text;
   }
 
-  return tweet;
+  return getById(tweet.id);
 }
 
 export async function remove(id) {
