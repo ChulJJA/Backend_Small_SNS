@@ -1,13 +1,4 @@
-let users = [
-  // {
-  //   id: '1',
-  //   username: 'chulseung100',
-  //   password: 'Tlqkfgkrltlfgek1@',
-  //   name: 'Chul',
-  //   email: 'cl1550@rutgers.edu',
-  //   url: '',
-  // },
-];
+let users = [];
 
 export async function findByUsername(username) {
   return users.find((user) => user.username === username);
