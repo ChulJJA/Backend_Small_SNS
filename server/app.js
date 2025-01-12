@@ -8,7 +8,7 @@ import authRouter from './router/auth.js';
 import { config } from './config.js';
 import { Server } from 'socket.io';
 import { initSocket } from './connection/socket.js';
-import { sequalize } from './db/database.js';
+import { connectDB } from './database/database.js';
 
 const app = express();
 
@@ -29,7 +29,9 @@ app.use((error, req, res, next) => {
   res.sendStatus(500);
 });
 
-sequalize.sync().then(() => {
-  const server = app.listen(config.host.port);
-  initSocket(server);
-});
+connectDB()
+  .then(() => {
+    const server = app.listen(config.host.port);
+    initSocket(server);
+  })
+  .catch(console.error);
