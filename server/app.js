@@ -10,11 +10,16 @@ import { Server } from 'socket.io';
 import { initSocket } from './connection/socket.js';
 import { sequalize } from './db/database.js';
 
+const corsOption = {
+  origin: config.cors.allowedOrigin,
+  optionsSuccessStatus: 200,
+};
+
 const app = express();
 
 app.use(express.json());
 app.use(helmet());
-app.use(cors());
+app.use(cors(corsOption));
 app.use(morgan('tiny'));
 
 app.use('/tweets', tweetsRouter);
@@ -30,6 +35,7 @@ app.use((error, req, res, next) => {
 });
 
 sequalize.sync().then(() => {
-  const server = app.listen(config.host.port);
+  console.log(`Server is started on ${new Date()}`);
+  const server = app.listen(config.port);
   initSocket(server);
 });
