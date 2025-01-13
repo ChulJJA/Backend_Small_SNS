@@ -7,7 +7,7 @@
   type: redirect
   to: 'https://www.{default}/'
 
-'https://www.{default}/ws':
+'https://{default}/ws':
   type: upstream
   upstream: 'Chul_SNS:http'
   cache:
